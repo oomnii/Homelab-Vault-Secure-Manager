@@ -1,0 +1,81 @@
+{% extends 'base.html' %}
+{% from 'macros/form_controls.html' import password_field %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Account</h1>
+        <p class="muted">Signed-in master profile. Manage destructive actions carefully at the bottom.</p>
+    </div>
+</div>
+
+<div class="grid-layout account-layout">
+    <section class="card card--scrollable">
+        <h2 class="card-scroll-title">Profile</h2>
+        <div class="card-body-scroll scroll-styled">
+            <div class="list-stack compact-gap">
+                <div class="list-item compact">
+                    <span class="muted">Username</span>
+                    <strong>{{ user.username }}</strong>
+                </div>
+                <div class="list-item compact">
+                    <span class="muted">Email (OTP delivery)</span>
+                    <strong>{{ user.email or '—' }}</strong>
+                </div>
+                <div class="list-item compact">
+                    <span class="muted">Account created</span>
+                    <strong>{{ format_ist(user.created_at) }}</strong>
+                </div>
+            </div>
+            <p class="muted small top-gap">Password changes are not available in this build. Use backup export before any destructive action.</p>
+        </div>
+    </section>
+
+    <section class="card card--scrollable card--danger-zone">
+        <h2 class="card-scroll-title">Danger Zone</h2>
+        <div class="card-body-scroll scroll-styled">
+            <p class="muted small">Deleting the master account removes the database user, all passwords, secure IDs, secure notes, folders, and login history from this instance. This cannot be undone.</p>
+            <ul class="feature-list small">
+                <li>You will be logged out immediately after success.</li>
+                <li>Export an encrypted backup first if you need a copy.</li>
+                <li>You must enter your master password, then a one-time code emailed to <strong>{{ user.email or 'your address' }}</strong>.</li>
+            </ul>
+
+            {% if not user.email %}
+            <p class="flash danger top-gap">No email is on file. Add one during login (complete-email flow) before account deletion can use OTP.</p>
+            {% endif %}
+
+            {% if deletion_otp_pending %}
+            <div class="danger-zone-panel top-gap">
+                <p class="small"><strong>Step 2 of 2:</strong> Enter the confirmation code sent to your email.</p>
+                {% if deletion_dev_otp and otp_dev_mode %}
+                <div class="dev-otp-box">
+                    <strong>Local development OTP</strong> (never use in production): <span id="deletion-dev-otp-value">{{ deletion_dev_otp }}</span>
+                </div>
+                {% endif %}
+                <form method="post" class="form-grid compact top-gap">
+                    <label>Deletion code<input type="text" name="otp" placeholder="Enter code" inputmode="numeric" autocomplete="one-time-code" maxlength="12" required></label>
+                    <div class="form-actions form-actions--split">
+                        <div class="form-actions__cluster">
+                            <button class="button danger-zone-secondary small-btn" type="submit" name="action" value="resend_account_deletion_otp" formnovalidate>Resend code</button>
+                            <button class="button danger-zone-quiet small-btn" type="submit" name="action" value="cancel_account_deletion" formnovalidate>Cancel deletion</button>
+                        </div>
+                        <button class="button danger danger-zone-primary" type="submit" name="action" value="confirm_account_deletion" onclick="return confirm('This permanently deletes your master account and all vault data on this server. This cannot be undone. Continue?');">Permanently delete master account</button>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="danger-zone-panel top-gap">
+                <p class="small"><strong>Step 1 of 2:</strong> Enter your current master password. We will email a confirmation code.</p>
+                <form method="post" class="form-grid compact top-gap">
+                    <input type="hidden" name="action" value="request_account_deletion">
+                    {{ password_field('Master password', 'master_password', 'Current master password', true, 'current-password', not user.email) }}
+                    <div class="form-actions">
+                        <button class="button danger danger-zone-primary" type="submit" {% if not user.email %}disabled{% endif %}>Email deletion code</button>
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

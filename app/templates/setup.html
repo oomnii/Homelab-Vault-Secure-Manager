@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% from 'macros/form_controls.html' import password_field %}
+{% block content %}
+<div class="auth-flow-stack scroll-styled">
+{% include 'partials/brand_auth_header.html' %}
+<div class="auth-card card scroll-styled">
+    <div class="hero-badge">First-Time Secure Setup</div>
+    <h1>Create Master Account</h1>
+    <p class="muted">Set up the vault owner with email-based verification for future logins.</p>
+    <form method="post" class="form-grid">
+        <label>Username<input type="text" name="username" placeholder="admin" required></label>
+        <label>Email ID<input type="email" name="email" placeholder="owner@example.com" required></label>
+        {{ password_field('Create Master Password', 'password', 'At least 8 characters', true, 'new-password') }}
+        {{ password_field('Confirm Master Password', 'confirm_password', 'Repeat password', true, 'new-password') }}
+        <button class="button primary" type="submit">Create Master Account</button>
+    </form>
+</div>
+</div>
+{% endblock %}

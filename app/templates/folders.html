@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Folders</h1>
+        <p class="muted">Organize passwords, secure IDs, and secure notes into neat categories.</p>
+    </div>
+</div>
+
+<div class="grid-layout">
+    <section class="card card--scrollable">
+        <h2 class="card-scroll-title">Create Folder</h2>
+        <div class="card-body-scroll scroll-styled">
+            <form method="post" action="{{ url_for('vault.create_folder') }}" class="form-grid compact">
+                <label>Folder Name<input type="text" name="name" placeholder="Banking" required></label>
+                <p class="muted small">Folders use the shared icon {{ folder_icon }} in lists and filters.</p>
+                <button class="button primary" type="submit">Add Folder</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="card card--scrollable">
+        <h2 class="card-scroll-title">Existing Folders</h2>
+        <div class="card-body-scroll scroll-styled">
+            {% if folders %}
+            <div class="folder-card-stack list-stack">
+                {% for folder in folders %}
+                <article class="folder-card-row">
+                    <a class="folder-card-open" href="{{ url_for('vault.folder_detail', folder_id=folder.id) }}" aria-label="Open folder {{ folder.name }}">
+                        <span class="folder-card-icon" aria-hidden="true">{{ folder_icon }}</span>
+                        <div class="folder-card-body">
+                            <div class="folder-card-title">{{ folder.name }}</div>
+                            <div class="folder-card-counts muted small">
+                                <span><strong>{{ folder.vault_items|length }}</strong> passwords</span>
+                                <span class="folder-card-count-sep">·</span>
+                                <span><strong>{{ folder.secure_ids|length }}</strong> secure IDs</span>
+                                <span class="folder-card-count-sep">·</span>
+                                <span><strong>{{ folder.secure_notes|length }}</strong> notes</span>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="folder-card-delete">
+                        <form method="post" action="{{ url_for('vault.delete_folder', folder_id=folder.id) }}" onsubmit="return confirm('Delete this folder? Linked items will be kept.')">
+                            <button class="button danger small-btn" type="submit">Delete</button>
+                        </form>
+                    </div>
+                </article>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No folders yet.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

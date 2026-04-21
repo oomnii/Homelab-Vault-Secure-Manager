@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Secure Notes</h1>
+        <p class="muted">Store private text snippets, recovery codes, PIN hints, or personal reminders in encrypted form.</p>
+    </div>
+</div>
+
+<div class="filters-row card filters-bar-card">
+    <form method="get" class="filters-bar-form" action="{{ url_for('vault.secure_notes') }}">
+        <input class="filters-bar-search" type="search" name="search" value="{{ search }}" placeholder="Search note title" autocomplete="off">
+        <select class="filters-bar-folder" name="folder_id" aria-label="Filter by folder">
+            <option value="">All folders</option>
+            {% for folder in folders %}
+            <option value="{{ folder.id }}" {{ 'selected' if selected_folder_id == folder.id|string else '' }}>{{ folder_icon }} {{ folder.name }}</option>
+            {% endfor %}
+        </select>
+        <button class="button secondary filters-bar-submit" type="submit">Filter</button>
+    </form>
+</div>
+
+<div class="grid-layout">
+    <section class="card card--scrollable">
+        <h2 class="card-scroll-title">Add Secure Note</h2>
+        <div class="card-body-scroll scroll-styled">
+            <form method="post" action="{{ url_for('vault.create_secure_note') }}" class="form-grid compact">
+                <label>Title<input type="text" name="title" placeholder="Wi-Fi recovery hint" required></label>
+                <label>Folder
+                    <select name="folder_id">
+                        <option value="">No folder</option>
+                        {% for folder in folders %}
+                        <option value="{{ folder.id }}">{{ folder_icon }} {{ folder.name }}</option>
+                        {% endfor %}
+                    </select>
+                </label>
+                <label>Secure Note<textarea name="note_content" rows="8" placeholder="Write your secret note here" required></textarea></label>
+                <button class="button primary" type="submit">Save Secure Note</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="card card--scrollable">
+        <h2 class="card-scroll-title">Saved Secure Notes</h2>
+        <div class="card-body-scroll scroll-styled">
+            {% if items %}
+            <div class="list-stack">
+                {% for item in items %}
+                {% set secret = decrypt_value(item.note_encrypted) %}
+                <details class="entry-card">
+                    <summary>
+                        <div>
+                            <div class="list-title">{{ item.title }}</div>
+                            <div class="muted small">{% if item.folder %}{{ folder_icon }} {{ item.folder.name }}{% else %}No folder{% endif %} · Updated {{ format_ist(item.updated_at, False) }}</div>
+                        </div>
+                        <div class="entry-actions">
+                            <button type="button" class="button ghost small-btn secret-toggle" data-secret-target="secret-note-{{ item.id }}">Show</button>
+                            <button type="button" class="button ghost small-btn copy-btn" data-copy="{{ secret }}">Copy</button>
+                        </div>
+                    </summary>
+                    <div class="secret-row"><strong>Secure Note:</strong> <span id="secret-note-{{ item.id }}" data-secret="{{ secret }}">••••••••</span></div>
+                    <form method="post" action="{{ url_for('vault.update_secure_note', item_id=item.id) }}" class="form-grid compact top-gap">
+                        <label>Title<input type="text" name="title" value="{{ item.title }}" required></label>
+                        <label>Folder
+                            <select name="folder_id">
+                                <option value="">No folder</option>
+                                {% for folder in folders %}
+                                <option value="{{ folder.id }}" {{ 'selected' if item.folder_id == folder.id else '' }}>{{ folder_icon }} {{ folder.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </label>
+                        <label>Secure Note<textarea name="note_content" rows="8" required>{{ secret }}</textarea></label>
+                        <div class="form-actions form-actions--split">
+                            <button class="button primary small-btn" type="submit">Update</button>
+                            <button class="button danger small-btn" type="submit" formaction="{{ url_for('vault.delete_secure_note', item_id=item.id) }}" formmethod="post" onclick="return confirm('Delete this secure note?')">Delete Secure Note</button>
+                        </div>
+                    </form>
+                </details>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No secure notes found.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

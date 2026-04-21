@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Dashboard</h1>
+        <p class="muted">Secure overview of your passwords, IDs, notes, backup readiness, and login activity.</p>
+    </div>
+    <div class="header-actions">
+        <a class="button ghost" href="{{ url_for('vault.backup_page') }}">Open Backup</a>
+        <a class="button primary" href="{{ url_for('vault.history_page') }}">View Login History</a>
+    </div>
+</div>
+
+<div class="stats-grid five-up">
+    <div class="stat card card--scrollable stat-card">
+        <div class="card-body-scroll scroll-styled">
+            <span>Total Passwords</span><strong>{{ stats.passwords }}</strong>
+        </div>
+    </div>
+    <div class="stat card card--scrollable stat-card">
+        <div class="card-body-scroll scroll-styled">
+            <span>Secure IDs</span><strong>{{ stats.secure_ids }}</strong>
+        </div>
+    </div>
+    <div class="stat card card--scrollable stat-card">
+        <div class="card-body-scroll scroll-styled">
+            <span>Secure Notes</span><strong>{{ stats.secure_notes }}</strong>
+        </div>
+    </div>
+    <div class="stat card card--scrollable stat-card">
+        <div class="card-body-scroll scroll-styled">
+            <span>Folders</span><strong>{{ stats.folders }}</strong>
+        </div>
+    </div>
+    <div class="stat card card--scrollable stat-card">
+        <div class="card-body-scroll scroll-styled">
+            <span>Login Events</span><strong>{{ stats.login_events }}</strong>
+        </div>
+    </div>
+</div>
+
+<section class="card info-strip-card">
+    <div class="info-strip">
+        <div>
+            <div class="list-title">Last successful secure login</div>
+            <div class="muted small">{{ format_ist(last_successful_login.occurred_at) if last_successful_login else 'No completed OTP login yet.' }}</div>
+        </div>
+        <div class="status-pair">
+            <span class="badge">Email OTP Enabled</span>
+            <span class="badge {{ 'secure-badge' if transport_mode == 'HTTPS' else 'warn-badge' }}">{{ transport_mode }} Ready</span>
+        </div>
+    </div>
+</section>
+
+<div class="dashboard-grid">
+    <section class="card card--scrollable">
+        <div class="section-title-row card-scroll-title">
+            <h2>Recent Password Entries</h2>
+            <a class="inline-link" href="{{ url_for('vault.vault_items') }}">Open Vault</a>
+        </div>
+        <div class="card-body-scroll scroll-styled">
+            {% if recent_items %}
+            <div class="list-stack">
+                {% for item in recent_items %}
+                <div class="list-item">
+                    <div>
+                        <div class="list-title">{{ item.title }}</div>
+                        <div class="muted small">{{ item.username or 'No username' }} · {% if item.folder %}{{ folder_icon }} {{ item.folder.name }}{% else %}No folder{% endif %}</div>
+                    </div>
+                    <div class="secret-chip">{{ decrypt_value(item.password_encrypted)[:2] }}••••</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No password entries yet.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="card card--scrollable">
+        <div class="section-title-row card-scroll-title">
+            <h2>Recent Secure IDs</h2>
+            <a class="inline-link" href="{{ url_for('vault.secure_ids') }}">Open IDs</a>
+        </div>
+        <div class="card-body-scroll scroll-styled">
+            {% if recent_secure_ids %}
+            <div class="list-stack">
+                {% for item in recent_secure_ids %}
+                <div class="list-item">
+                    <div>
+                        <div class="list-title">{{ item.title }}</div>
+                        <div class="muted small">{{ item.id_type }} · {% if item.folder %}{{ folder_icon }} {{ item.folder.name }}{% else %}No folder{% endif %}</div>
+                    </div>
+                    <div class="secret-chip">{{ decrypt_value(item.id_value_encrypted)[:2] }}••••</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No secure IDs yet.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="card card--scrollable">
+        <div class="section-title-row card-scroll-title">
+            <h2>Recent Secure Notes</h2>
+            <a class="inline-link" href="{{ url_for('vault.secure_notes') }}">Open Notes</a>
+        </div>
+        <div class="card-body-scroll scroll-styled">
+            {% if recent_secure_notes %}
+            <div class="list-stack">
+                {% for item in recent_secure_notes %}
+                {% set note_text = decrypt_value(item.note_encrypted) %}
+                <div class="list-item">
+                    <div>
+                        <div class="list-title">{{ item.title }}</div>
+                        <div class="muted small">{% if item.folder %}{{ folder_icon }} {{ item.folder.name }}{% else %}No folder{% endif %} · Updated {{ format_ist(item.updated_at, False) }}</div>
+                    </div>
+                    <div class="secret-chip">{{ note_text[:10] }}•••</div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No secure notes yet.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="card card--scrollable">
+        <div class="section-title-row card-scroll-title">
+            <h2>Recent Login Activity</h2>
+            <a class="inline-link" href="{{ url_for('vault.history_page') }}">Full History</a>
+        </div>
+        <div class="card-body-scroll scroll-styled">
+            {% if recent_history %}
+            <div class="list-stack">
+                {% for item in recent_history %}
+                <div class="activity-row">
+                    <div>
+                        <div class="list-title">{{ item.event_type.replace('_', ' ')|title }}</div>
+                        <div class="muted small">{{ item.username_snapshot }} · {{ format_ist(item.occurred_at) }}</div>
+                    </div>
+                    <span class="badge {{ 'secure-badge' if item.status in ['passed', 'success', 'sent', 'updated'] else 'danger-badge' }}">{{ item.status }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No login activity recorded yet.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

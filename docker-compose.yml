@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  homelab-vault:
+    build: .
+    container_name: homelab-vault
+    ports:
+      - "5000:5000"
+    environment:
+      SECRET_KEY: change-this-secret-before-demo
+      ENABLE_PROXY_FIX: "true"
+      OTP_DEV_MODE: "false"
+      SMTP_SERVER: ""
+      SMTP_PORT: "587"
+      SMTP_USERNAME: ""
+      SMTP_PASSWORD: ""
+      SMTP_FROM_EMAIL: ""
+      SMTP_USE_TLS: "true"
+      SMTP_USE_SSL: "false"
+    volumes:
+      - ./instance:/app/instance
+    restart: unless-stopped

@@ -1,0 +1,30 @@
+version: '3.8'
+services:
+  homelab-vault:
+    environment:
+      SESSION_COOKIE_SECURE: "true"
+      FORCE_HTTPS: "true"
+      ENABLE_PROXY_FIX: "true"
+    expose:
+      - "5000"
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: homelab-vault-caddy
+    depends_on:
+      - homelab-vault
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN_NAME: ${DOMAIN_NAME:-localhost}
+      ACME_EMAIL: ${ACME_EMAIL:-}
+    volumes:
+      - ./deploy/caddy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+
+volumes:
+  caddy_data:
+  caddy_config:

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% set favicon_href = url_for('static', filename='images/favicon.png') ~ '?v=' ~ favicon_cache_v %}
+    <link rel="icon" type="image/png" href="{{ favicon_href }}">
+    <link rel="shortcut icon" type="image/png" href="{{ favicon_href }}">
+    <title>{{ app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script defer src="{{ url_for('static', filename='js/app.js') }}"></script>
+</head>
+<body>
+    <div class="shell{% if not session.get('user_id') %} shell--auth{% endif %}">
+        {% if session.get('user_id') %}
+        <aside class="sidebar">
+            <div>
+                <div class="brand-row">
+                    <img src="{{ url_for('static', filename='images/logo.png') }}?v={{ logo_cache_v }}" alt="" class="brand-logo-img" width="112" height="36" decoding="async">
+                    <div class="brand-text-block">
+                        <div class="brand">Homelab Vault</div>
+                        <div class="brand-subtext">Self-hosted on Raspberry Pi</div>
+                    </div>
+                </div>
+                <div class="transport-pill {{ 'secure' if transport_mode == 'HTTPS' else 'insecure' }}">{{ transport_mode }} Mode</div>
+                <nav class="nav-links">
+                    <a href="{{ url_for('vault.dashboard') }}" class="nav-link {{ 'active' if request.endpoint == 'vault.dashboard' else '' }}">Dashboard</a>
+                    <a href="{{ url_for('vault.vault_items') }}" class="nav-link {{ 'active' if request.endpoint == 'vault.vault_items' else '' }}">Passwords</a>
+                    <a href="{{ url_for('vault.secure_ids') }}" class="nav-link {{ 'active' if request.endpoint == 'vault.secure_ids' else '' }}">Secure IDs</a>
+                    <a href="{{ url_for('vault.secure_notes') }}" class="nav-link {{ 'active' if request.endpoint == 'vault.secure_notes' else '' }}">Secure Notes</a>
+                    <a href="{{ url_for('vault.folders') }}" class="nav-link {{ 'active' if request.endpoint in ('vault.folders', 'vault.folder_detail') else '' }}">Folders</a>
+                    <a href="{{ url_for('vault.backup_page') }}" class="nav-link {{ 'active' if request.endpoint == 'vault.backup_page' else '' }}">Backup & Export</a>
+                    <a href="{{ url_for('vault.history_page') }}" class="nav-link {{ 'active' if request.endpoint == 'vault.history_page' else '' }}">Login History</a>
+                    <a href="{{ url_for('vault.account_page') }}" class="nav-link {{ 'active' if request.endpoint == 'vault.account_page' else '' }}">Account</a>
+                </nav>
+            </div>
+            <div class="sidebar-footer">
+                <div class="muted small">Signed in as</div>
+                <div class="username">{{ session.get('username') }}</div>
+                <form method="post" action="{{ url_for('auth.logout') }}">
+                    <button class="button secondary full-width" type="submit">Logout</button>
+                </form>
+            </div>
+        </aside>
+        {% endif %}
+
+        <main class="main {% if not session.get('user_id') %}auth-main{% endif %}">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            <div class="flash-stack">
+                {% for category, message in messages %}
+                <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            {% endwith %}
+            <div class="main-body-inner">{% block content %}{% endblock %}</div>
+        </main>
+    </div>
+</body>
+</html>

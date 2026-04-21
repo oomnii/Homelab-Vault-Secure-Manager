@@ -1,0 +1,21 @@
+{
+    email {$ACME_EMAIL}
+}
+
+{$DOMAIN_NAME:localhost} {
+    reverse_proxy homelab-vault:5000
+    encode gzip
+    header {
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "SAMEORIGIN"
+        Referrer-Policy "strict-origin-when-cross-origin"
+    }
+}
+
+# For a LAN-only demo on Raspberry Pi, you can switch to a local certificate by replacing
+# the site block above with something like:
+#
+# https://192.168.1.20 {
+#     tls internal
+#     reverse_proxy homelab-vault:5000
+# }

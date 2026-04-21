@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>{{ folder_icon }} {{ folder.name }}</h1>
+        <p class="muted">Everything linked to this folder in one place. Delete the folder only from the folders list.</p>
+    </div>
+    <div class="header-actions">
+        <a class="button secondary" href="{{ url_for('vault.folders') }}">Back to Folders</a>
+        <a class="button ghost" href="{{ url_for('vault.vault_items', folder_id=folder.id) }}">Open in Passwords</a>
+    </div>
+</div>
+
+<div class="folder-detail-grid">
+    <section class="card card--scrollable folder-detail-column">
+        <h2 class="card-scroll-title">Passwords <span class="badge">{{ vault_items|length }}</span></h2>
+        <div class="card-body-scroll scroll-styled">
+            {% if vault_items %}
+            <div class="list-stack">
+                {% for item in vault_items %}
+                {% set secret = decrypt_value(item.password_encrypted) %}
+                <details class="entry-card folder-detail-entry">
+                    <summary>
+                        <div>
+                            <div class="list-title">{{ item.title }}</div>
+                            <div class="muted small">{{ item.username or 'No username' }} · {{ item.website or '—' }}</div>
+                        </div>
+                        <div class="entry-actions">
+                            <button type="button" class="button ghost small-btn secret-toggle" data-secret-target="fd-pw-{{ item.id }}">Show</button>
+                            <button type="button" class="button ghost small-btn copy-btn" data-copy="{{ secret }}">Copy</button>
+                        </div>
+                    </summary>
+                    <div class="secret-row"><strong>Password:</strong> <span id="fd-pw-{{ item.id }}" data-secret="{{ secret }}">••••••••</span></div>
+                </details>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No password entries in this folder.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="card card--scrollable folder-detail-column">
+        <h2 class="card-scroll-title">Secure IDs <span class="badge">{{ secure_ids_items|length }}</span></h2>
+        <div class="card-body-scroll scroll-styled">
+            {% if secure_ids_items %}
+            <div class="list-stack">
+                {% for item in secure_ids_items %}
+                {% set secret = decrypt_value(item.id_value_encrypted) %}
+                <details class="entry-card folder-detail-entry">
+                    <summary>
+                        <div>
+                            <div class="list-title">{{ item.title }}</div>
+                            <div class="muted small">{{ item.id_type }}</div>
+                        </div>
+                        <div class="entry-actions">
+                            <button type="button" class="button ghost small-btn secret-toggle" data-secret-target="fd-id-{{ item.id }}">Show</button>
+                            <button type="button" class="button ghost small-btn copy-btn" data-copy="{{ secret }}">Copy</button>
+                        </div>
+                    </summary>
+                    <div class="secret-row"><strong>ID Value:</strong> <span id="fd-id-{{ item.id }}" data-secret="{{ secret }}">••••••••</span></div>
+                </details>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No secure IDs in this folder.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="card card--scrollable folder-detail-column">
+        <h2 class="card-scroll-title">Secure Notes <span class="badge">{{ secure_notes_items|length }}</span></h2>
+        <div class="card-body-scroll scroll-styled">
+            {% if secure_notes_items %}
+            <div class="list-stack">
+                {% for item in secure_notes_items %}
+                {% set secret = decrypt_value(item.note_encrypted) %}
+                <details class="entry-card folder-detail-entry">
+                    <summary>
+                        <div>
+                            <div class="list-title">{{ item.title }}</div>
+                            <div class="muted small">Updated {{ format_ist(item.updated_at, False) }}</div>
+                        </div>
+                        <div class="entry-actions">
+                            <button type="button" class="button ghost small-btn secret-toggle" data-secret-target="fd-note-{{ item.id }}">Show</button>
+                            <button type="button" class="button ghost small-btn copy-btn" data-copy="{{ secret }}">Copy</button>
+                        </div>
+                    </summary>
+                    <div class="secret-row"><strong>Note:</strong> <span id="fd-note-{{ item.id }}" data-secret="{{ secret }}">••••••••</span></div>
+                </details>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="muted">No secure notes in this folder.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}

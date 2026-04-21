@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Backup & Export</h1>
+        <p class="muted">Export an encrypted JSON backup of your folders, passwords, secure IDs, and secure notes.</p>
+    </div>
+</div>
+
+<div class="two-col">
+    <section class="card card--scrollable">
+        <h2 class="card-scroll-title">Encrypted Vault Export</h2>
+        <div class="card-body-scroll scroll-styled">
+            <p class="muted">The export keeps secret fields encrypted exactly as they are stored in the database. This helps you back up the vault without exposing raw secrets in the file.</p>
+            <div class="list-stack compact-gap top-gap">
+                <div class="list-item compact"><span>Passwords</span><strong>{{ stats.passwords }}</strong></div>
+                <div class="list-item compact"><span>Secure IDs</span><strong>{{ stats.secure_ids }}</strong></div>
+                <div class="list-item compact"><span>Secure Notes</span><strong>{{ stats.secure_notes }}</strong></div>
+                <div class="list-item compact"><span>Folders</span><strong>{{ stats.folders }}</strong></div>
+            </div>
+            <form method="post" action="{{ url_for('vault.export_backup') }}" class="top-gap">
+                <button class="button primary" type="submit">Download Encrypted Backup</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="card card--scrollable">
+        <h2 class="card-scroll-title">What This Backup Contains</h2>
+        <div class="card-body-scroll scroll-styled">
+            <ul class="feature-list">
+                <li>Folder structure and metadata</li>
+                <li>Encrypted password ciphertext</li>
+                <li>Encrypted secure ID ciphertext</li>
+                <li>Encrypted secure note ciphertext</li>
+                <li>Creation and update timestamps</li>
+            </ul>
+            <div class="inline-note top-gap">Keep the same <code>SECRET_KEY</code> or explicit <code>FERNET_KEY</code> when restoring encrypted values later.</div>
+        </div>
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="auth-flow-stack scroll-styled">
+{% include 'partials/brand_auth_header.html' %}
+<div class="auth-card card scroll-styled">
+    <div class="hero-badge">Step 2 of 2</div>
+    <h1>Verify Email OTP</h1>
+    <p class="muted">A fresh login OTP has been sent to <strong>{{ user.email }}</strong>. It is required every time you log in.</p>
+    {% if dev_otp and otp_dev_mode %}
+    <div class="dev-otp-box">
+        <strong>Local development OTP</strong> (never use in production): <span id="dev-otp-value">{{ dev_otp }}</span>
+        <p class="dev-otp-hint small">With <code>OTP_DEV_MODE=true</code>, the same code is also printed in the server console.</p>
+    </div>
+    {% endif %}
+    <form method="post" class="form-grid">
+        <label>6-digit OTP<input type="text" name="otp" placeholder="Enter OTP" inputmode="numeric" maxlength="6" required></label>
+        <div class="form-actions form-actions--split">
+            <button class="button primary" type="submit">Verify OTP & Unlock Vault</button>
+            <button class="button ghost" type="submit" formaction="{{ url_for('auth.resend_otp') }}" formmethod="post" formnovalidate>Resend New OTP</button>
+        </div>
+    </form>
+</div>
+</div>
+{% endblock %}

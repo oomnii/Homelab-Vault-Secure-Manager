@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% from 'macros/form_controls.html' import password_field %}
+{% block content %}
+<div class="auth-flow-stack scroll-styled">
+{% include 'partials/brand_auth_header.html' %}
+{% if otp_delivery_mode == 'email' %}
+<p class="otp-mode-banner otp-mode-banner--email" role="status"><strong>Email OTP mode.</strong> After your password is accepted, a code is sent to your registered inbox.</p>
+{% elif otp_delivery_mode == 'dev' %}
+<p class="otp-mode-banner otp-mode-banner--dev" role="status"><strong>Local dev OTP mode.</strong> SMTP is not in use; the next screen (and server log) will show the code. Do not use in production.</p>
+{% else %}
+<p class="otp-mode-banner otp-mode-banner--warn" role="alert"><strong>Misconfigured.</strong> Add <code>OTP_DEV_MODE=true</code> to the <code>.env</code> file next to <code>run.py</code> for local testing, or configure all SMTP variables for real email OTP.</p>
+{% endif %}
+<div class="auth-card card">
+    <div class="hero-badge">Secure Login</div>
+    <h1>Sign in to Homelab Vault</h1>
+    <p class="muted">Enter your master password first. A fresh OTP is required on every login.</p>
+    <form method="post" class="form-grid">
+        <label>Username or Email<input type="text" name="identifier" placeholder="Enter username or email" required></label>
+        {{ password_field('Password', 'password', 'Enter master password', true, 'current-password') }}
+        <button class="button primary" type="submit">Verify Password</button>
+    </form>
+</div>
+</div>
+{% endblock %}

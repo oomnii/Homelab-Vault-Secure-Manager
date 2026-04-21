@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="auth-flow-stack scroll-styled">
+{% include 'partials/brand_auth_header.html' %}
+<div class="auth-card card scroll-styled">
+    <div class="hero-badge">One-Time Upgrade Step</div>
+    <h1>Add Email for OTP Login</h1>
+    <p class="muted">Your existing vault data is intact. Add an email once so every future login can use OTP verification.</p>
+    <form method="post" class="form-grid">
+        <label>Email ID<input type="email" name="email" value="{{ user.email or '' }}" placeholder="owner@example.com" required></label>
+        <label>Confirm Email ID<input type="email" name="confirm_email" value="{{ user.email or '' }}" placeholder="Repeat email" required></label>
+        <button class="button primary" type="submit">Save Email & Send OTP</button>
+    </form>
+</div>
+</div>
+{% endblock %}

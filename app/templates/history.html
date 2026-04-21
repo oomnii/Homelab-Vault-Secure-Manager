@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="page-fill-layout history-page">
+    <div class="page-header">
+        <div>
+            <h1>Login History</h1>
+            <p class="muted">Past password checks, OTP delivery, OTP verification, and logout events. Times are shown in IST.</p>
+        </div>
+    </div>
+
+    <section class="card card--scrollable history-table-card">
+        <h2 class="card-scroll-title">Event log</h2>
+        <div class="card-body-scroll scroll-styled">
+            {% if history_items %}
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Time (IST)</th>
+                            <th>User</th>
+                            <th>Event</th>
+                            <th>Status</th>
+                            <th>IP</th>
+                            <th>Browser</th>
+                            <th>Detail</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in history_items %}
+                        <tr>
+                            <td>{{ format_ist(item.occurred_at) }}</td>
+                            <td>{{ item.username_snapshot }}</td>
+                            <td>{{ item.event_type.replace('_', ' ')|title }}</td>
+                            <td><span class="badge {{ 'secure-badge' if item.status in ['passed', 'success', 'sent', 'updated', 'completed'] else 'danger-badge' }}">{{ item.status }}</span></td>
+                            <td>{{ item.ip_address or '—' }}</td>
+                            <td class="truncate-cell">{{ item.user_agent or '—' }}</td>
+                            <td>{{ item.detail or '—' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="muted">No login history available yet.</p>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}
