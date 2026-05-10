@@ -1,6 +1,6 @@
 # Homelab Vault Secure Manager
 
-Self-hosted password and secrets manager for Raspberry Pi, Docker, or any machine that can run Flask and SQLite. This repo is structured for **GitHub** and **production-style deployment**: configuration comes from environment variables and `.env` .
+Self-hosted password and secrets manager for Raspberry Pi, Docker, or any machine that can run Flask and SQLite. This repo is structured for **GitHub** and **production-style deployment**: configuration comes from environment variables and `.env`.
 
 ## Description
 
@@ -69,13 +69,13 @@ Homelab Vault is a single-user style vault: one master account, password login, 
    pip install -r requirements.txt
    ```
 
-3. Copy environment template and edit placeholders (see `.env.example`):
+3. Create `.env` from the template if you do not already have one (this never overwrites an existing `.env`):
 
    ```bash
-   cp .env.example .env
+   python scripts/ensure_env.py
    ```
 
-   Use `OTP_DEV_MODE=true` for local runs without SMTP. For real email OTP, set `OTP_DEV_MODE=false` and fill in all SMTP variables with real values (never commit them).
+   Then edit `.env` for your environment (see `.env.example` for all keys). Use `OTP_DEV_MODE=true` for local runs without SMTP. For real email OTP, set `OTP_DEV_MODE=false` and fill in all SMTP variables with real values (never commit them).
 
 4. Run the app:
 

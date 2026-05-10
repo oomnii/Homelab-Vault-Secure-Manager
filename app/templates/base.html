@@ -18,8 +18,9 @@
                 <div class="brand-row">
                     <img src="{{ url_for('static', filename='images/logo.png') }}?v={{ logo_cache_v }}" alt="" class="brand-logo-img" width="112" height="36" decoding="async">
                     <div class="brand-text-block">
-                        <div class="brand">Homelab Vault</div>
-                        <div class="brand-subtext">Self-hosted on Raspberry Pi</div>
+                        <div class="brand-title-line">
+                            <span class="brand">Homelab Vault</span><span class="brand-subtext">Self-hosted on Raspberry Pi</span>
+                        </div>
                     </div>
                 </div>
                 <div class="transport-pill {{ 'secure' if transport_mode == 'HTTPS' else 'insecure' }}">{{ transport_mode }} Mode</div>

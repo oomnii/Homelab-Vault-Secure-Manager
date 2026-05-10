@@ -84,8 +84,19 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0
     box-sizing: content-box;
 }
 .brand-text-block { min-width: 0; }
+.brand-title-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4em 0.55em;
+    min-width: 0;
+}
 .brand { font-size: 1.35rem; font-weight: 800; color: var(--sidebar-text); }
-.brand-subtext { color: var(--sidebar-muted); margin-top: 4px; font-size: 0.94rem; }
+.brand-subtext {
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: rgba(255, 248, 240, 0.68);
+}
 .transport-pill {
     display: inline-flex;
     align-items: center;
@@ -269,8 +280,7 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0
 
 .auth-flow-stack {
     width: min(100%, 520px);
-    max-height: 92dvh;
-    overflow-y: auto;
+    overflow: visible;
     padding: 2px 0 10px;
 }
 
@@ -317,10 +327,6 @@ code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0
 
 /* Match parent column (e.g. 520px auth column) so card and flash banners share one width */
 .auth-card { width: 100%; max-width: 520px; }
-.auth-card.card.scroll-styled {
-    max-height: min(92dvh, 780px);
-    overflow-y: auto;
-}
 
 /* Fixed-height cards with internal scroll (authenticated views) */
 .card.card--scrollable {
